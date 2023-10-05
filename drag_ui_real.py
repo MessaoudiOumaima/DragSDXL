@@ -115,7 +115,7 @@ def inference(source_image,
     #cude_seed = random.randint(1, 60) 
     
     accelerator = Accelerator(
-        gradient_accumulation_steps=2,
+        gradient_accumulation_steps=50,
         mixed_precision='fp16'
     )
 
@@ -147,7 +147,7 @@ def inference(source_image,
     args.lam = lam
 
     # args.lr = lr
-    args.lr = 0.01
+    args.lr = 0.001
 
     args.n_pix_step = n_pix_step
     print(args)

@@ -369,7 +369,7 @@ class DragXLPipeline(StableDiffusionXLPipeline): #StableDiffusionPipeline
             z,
             t,
             encoder_hidden_states=encoder_hidden_states, 
-            added_cond_kwargs=added_cond_kwargs,
+            #added_cond_kwargs=added_cond_kwargs,
             #return_intermediates=True #this is not available for unet2dCondition
         )[0]
 
@@ -391,7 +391,7 @@ class DragXLPipeline(StableDiffusionXLPipeline): #StableDiffusionPipeline
         batch_size=5,
         height=512,
         width=512,
-        num_inference_steps=50,
+        num_inference_steps=5,
         num_actual_inference_steps=None,
         guidance_scale=7.5,
         eta=0.0,
@@ -500,7 +500,7 @@ class DragXLPipeline(StableDiffusionXLPipeline): #StableDiffusionPipeline
         self,
         image: torch.Tensor,
         prompt,
-        num_inference_steps=50,
+        num_inference_steps=5,
         num_actual_inference_steps=None,
         guidance_scale=7.5,
         eta=0.0,
@@ -795,8 +795,9 @@ class DragXLPipeline(StableDiffusionXLPipeline): #StableDiffusionPipeline
                         model_inputs,
                         t,
                         prompt_embeds_input,
-                        added_cond_kwargs=unet_added_conditions,
-                        return_dict=False,)[0]
+                        #added_cond_kwargs=unet_added_conditions,
+                        #return_dict=False,
+                        )[0]
 
             '''noise_pred = self.unet(
                     model_inputs,

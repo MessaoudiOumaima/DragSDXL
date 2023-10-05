@@ -152,7 +152,7 @@ def drag_diffusion_update(model, init_code, t, handle_points, target_points, mas
 
     # prepare optimizable init_code and optimizer
     init_code.requires_grad_(True)
-    optimizer = torch.optim.SGD([init_code], lr=args.lr) #changed Adam to SGD
+    optimizer = torch.optim.Adam([init_code], lr=args.lr) #changed Adam to SGD
     optimizer = accelerate.prepare_optimizer(optimizer)
 
     # prepare for point tracking and background regularization
@@ -161,8 +161,17 @@ def drag_diffusion_update(model, init_code, t, handle_points, target_points, mas
 
     # prepare amp scaler for mixed-precision training
     scaler = torch.cuda.amp.GradScaler()
+    
+    #allocated_memory = torch.cuda.memory_allocated()
+    #print(f"GPU memory allocated: {allocated_memory / (1024**3):.2f} GB")
+    #cached_memory = torch.cuda.memory_cached()
+    #print(f"GPU memory cached: {cached_memory / (1024**3):.2f} GB")
+    
     for step_idx in range(args.n_pix_step):
         with torch.autocast(device_type='cuda', dtype=torch.float16):
+            #allocated_memory_before = torch.cuda.memory_allocated()
+            #print(f"GPU memory allocated before training: {allocated_memory_before / (1024**3):.2f} GB")
+            
             unet_output, F1 = model.forward_unet_features(init_code, t, encoder_hidden_states=prompt_embeds_input, added_cond_kwargs=unet_added_conditions,
                 layer_idx=args.unet_feature_idx, interp_res=args.sup_res)
             x_prev_updated, _ = model.step(unet_output, t, init_code)
@@ -195,6 +204,8 @@ def drag_diffusion_update(model, init_code, t, handle_points, target_points, mas
             print('loss total=%f'%(loss.item()))
 
         print('before backward loss ')
+        #print('estimated memory',torch.cuda.memory_summary(device=None, abbreviated=False))
+
         #scaler.scale(loss).backward()
         accelerate.backward(loss)
         print('backward loss done')
